@@ -1,13 +1,16 @@
 use std::env;
-use std::fs;
+use std::process;
+use minigrep::Config;
 
 fn main() {
     let args:Vec<String> = env::args().collect();
-    let query = &args[1];
-    let file_path  = &args[2];
-    println!("Searching the {query} and file path {file_path}");
-    // dbg!(args);
-    let contents = fs::read_to_string(file_path).expect("he file path you are expecting is missing");
+    let config = Config::build(&args).unwrap_or_else(|err| {
+        eprintln!("Problem parsing arguments: {err}");
+        process::exit(1);
+    });
 
-    println!("the file contains the folloowing content {}", contents)
+    if let Err(e) = minigrep::run(config){
+        eprintln!("application error : {e}");
+        process::exit(1);
+    };
 }
